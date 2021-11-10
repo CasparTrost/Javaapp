@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">ZItate</string>
+    <string name="app_name">Testapp</string>
+    <string name="error_no_sensor">No sensor</string>
+    <string name="label_accelerate">Accelerometer: %1$s</string>
+    <string name="label_light">Lichtsensor: %1$s</string>
+    <string name="label_magnet">Magnetometer: %1$s</string>
 </resources>

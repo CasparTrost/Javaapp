@@ -25,15 +25,16 @@ public class MainActivity extends AppCompatActivity
     private View view;
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    // System sensor manager instance.
+
+
     private SensorManager mSensorManager;
 
-    // Proximity and light sensors, as retrieved from the sensor manager.
+    // Festlegung der Sensoren
     private Sensor mSensorAccelerate;
     private Sensor mSensorLight;
     private Sensor mSensorMagnet;
 
-    // TextViews to display current sensor values.
+    // TextViews zur Anzeige der Sensorenwerte.
     private TextView mTextSensorLight;
     private TextView mTextSensorAccelerate;
     private TextView mTextSensorMagnet;
@@ -44,29 +45,26 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
 
-        // Initialize all view variables.
+        // Initialisierung der TextViews.
         mTextSensorLight = (TextView) findViewById(R.id.label_light);
         mTextSensorAccelerate = (TextView) findViewById(R.id.label_accelerate);
         mTextSensorMagnet = (TextView) findViewById(R.id.label_magnet);
 
-        // Get an instance of the sensor manager.
+        // Instanz des Sensormanagers
         mSensorManager = (SensorManager) getSystemService(
                 Context.SENSOR_SERVICE);
 
-        // Get light and proximity sensors from the sensor manager.
-        // The getDefaultSensor() method returns null if the sensor
-        // is not available on the device.
+        // Abrufen der Sensoren
         Log.i(LOG_TAG, "Überprüfung ob die Sensoren abrufbar sind ...");
         mSensorAccelerate = mSensorManager.getDefaultSensor(
                 Sensor.TYPE_ACCELEROMETER);
         mSensorLight = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         mSensorMagnet = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
-        // Get the error message from string resources.
+        // Fehlermeldung
         String sensor_error = getResources().getString(R.string.error_no_sensor);
 
-        // If either mSensorLight or mSensorProximity are null, those sensors
-        // are not available in the device.  Set the text to the error message
+        // Überprüfung ob Sensoren vorhanden sind
         if (mSensorLight == null) {
             mTextSensorLight.setText(sensor_error);
         }
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity
 
 
     public void startAcc(View view) {
-        // Do something in response to button click
+        // Funktion für Buttonklick Accelerometer
         new AlertDialog.Builder(this)
                 .setTitle("Accelerometerbutton")
                 .setMessage("Accelerometer wurde abgelesen")
@@ -100,7 +98,7 @@ public class MainActivity extends AppCompatActivity
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                finalView.setBackgroundColor(Color.WHITE); //set the color to black
+                finalView.setBackgroundColor(Color.WHITE);
             }
         }, 2000);
 
@@ -108,7 +106,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startMag(View view) {
-        // Do something in response to button click
+        // Funktion für Buttonklick Magnetometer
         new AlertDialog.Builder(this)
                 .setTitle("Magnetometerbutton")
                 .setMessage("Mamgnetometer wurde abgelesen")
@@ -127,7 +125,7 @@ public class MainActivity extends AppCompatActivity
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                finalView.setBackgroundColor(Color.WHITE); //set the color to black
+                finalView.setBackgroundColor(Color.WHITE);
             }
         }, 2000);
 
@@ -148,14 +146,7 @@ public class MainActivity extends AppCompatActivity
                 R.string.label_magnet,  "----"));
 
 
-
-        // Listeners for the sensors are registered in this callback and
-        // can be unregistered in onPause().
-        //
-        // Check to ensure sensors are available before registering listeners.
-        // Both listeners are registered with a "normal" amount of delay
-        // (SENSOR_DELAY_NORMAL)
-
+        // Wenn Sensor vorhanden, Listener registrieren
         if (mSensorLight != null) {
             mSensorManager.registerListener(this, mSensorLight,
                     SensorManager.SENSOR_DELAY_NORMAL);
@@ -167,23 +158,21 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
 
-        // Unregister all sensor listeners in this callback so they don't
-        // continue to use resources when the app is paused.
+        // Listener beenden wenn App pausiert
         mSensorManager.unregisterListener(this);
     }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        // The sensor type (as defined in the Sensor class).
+        // Sensortyp bestimmen
         int sensorType = sensorEvent.sensor.getType();
-        // The new data value of the sensor.  Both the light and proximity
-        // sensors report one value at a time, which is always the first
-        // element in the values array.
+
+        // currentValue zum Abrufen des aktuellen Sensorwertes
         float currentValue = sensorEvent.values[0];
 
 
         switch (sensorType) {
-            // Event came from the light sensor.
+            // Case für Lichtensor
             case Sensor.TYPE_LIGHT:
                 Log.i(LOG_TAG, "Text wird für 2000ms geflashed ...");
                 Log.i(LOG_TAG, "Der Lichtsensorwert hat sich geändert! Der Wert ist jetzt bei: " + String.format("%1.2f", currentValue));
@@ -194,18 +183,17 @@ public class MainActivity extends AppCompatActivity
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        finalView.setBackgroundColor(Color.WHITE); //set the color to black
+                        finalView.setBackgroundColor(Color.WHITE);
                     }
                 }, 2000);
 
-                // Set the light sensor text view to the light sensor string
-                // from the resources, with the placeholder filled in.
+                // TextView für Sensor verändern
                 mTextSensorLight.setText(getResources().getString(
                         R.string.label_light, String.format("%1.2f", currentValue)));
                 break;
-
+            // Case für Magnetometer
             case Sensor.TYPE_MAGNETIC_FIELD:
-
+                // TextView für Sensor verändern
                 mTextSensorMagnet.setText(getResources().getString(
                         R.string.label_magnet, "   Z:   " + String.format("%1.2f", sensorEvent.values[0]) + "   X:   " + String.format("%1.2f",sensorEvent.values[1]) + "   Y:   " + String.format("%1.2f",sensorEvent.values[2])));
                 Log.i(LOG_TAG, "Der Magnetometerwert hat sich geändert!" +  " " + "Z:   " + String.format("%1.2f", sensorEvent.values[0]) + "   X:   " + String.format("%1.2f",sensorEvent.values[1]) + "   Y:   " + String.format("%1.2f",sensorEvent.values[2]));
@@ -213,8 +201,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case Sensor.TYPE_ACCELEROMETER:
 
-                // Set the proximity sensor text view to the light sensor
-                // string from the resources, with the placeholder filled in.
+                // Case für Accelerometer
                 mTextSensorAccelerate.setText(getResources().getString(
                         R.string.label_accelerate, "   Z:   " + String.format("%1.2f", sensorEvent.values[0]) + "   X:   " + String.format("%1.2f",sensorEvent.values[1]) + "   Y:   " + String.format("%1.2f",sensorEvent.values[2])));
                 Log.i(LOG_TAG, "Die Lage des Device hat sich geändert!" +  " " + "Z:   " + String.format("%1.2f", sensorEvent.values[0]) + "   X:   " + String.format("%1.2f",sensorEvent.values[1]) + "   Y:   " + String.format("%1.2f",sensorEvent.values[2]));
@@ -228,10 +215,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    /**
-     * Abstract method in SensorEventListener.  It must be implemented, but is
-     * unused in this app.
-     */
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
     }
